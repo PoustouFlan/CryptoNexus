@@ -1,13 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../userContext";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function LoginPage() {
   const { setUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const token = searchParams.get("token");
+    if (token) {
+      localStorage.setItem("token", token);
+
+      fetch("https://cryptonex.us/api/auth/profile", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then((res) => res.json())
+        .then((user) => {
+          setUser(user);
+          router.push("/"); // redirect to homepage
+        })
+        .catch(() => {
+          setError("Failed to fetch profile");
+        });
+    }
+  }, [searchParams, setUser, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,6 +46,7 @@ export default function LoginPage() {
       const { access_token, user } = await res.json();
       localStorage.setItem("token", access_token);
       setUser(user);
+      router.push("/");
     } else {
       setError("Invalid credentials");
     }

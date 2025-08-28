@@ -57,7 +57,7 @@ services:
     build: ./frontend
     container_name: cryptonexus-frontend-1
     environment:
-      NEXT_PUBLIC_API_URL: https://cryptonex.us:4000
+      NEXT_PUBLIC_API_URL: https://cryptonex.us/api
     ports:
       - "3000:3000"
     depends_on:

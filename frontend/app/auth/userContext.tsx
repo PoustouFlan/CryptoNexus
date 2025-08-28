@@ -18,12 +18,18 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
-  // Optional: fetch logged-in user on mount
   useEffect(() => {
-    fetch("https://cryptonex.us/auth/profile", {
-      credentials: "include",
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    fetch("https://cryptonex.us/api/auth/profile", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("Unauthorized");
+        return res.json()
+      })
       .then(setUser)
       .catch(() => setUser(null));
   }, []);

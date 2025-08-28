@@ -9,13 +9,14 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     super({
       clientID: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      callbackURL: 'https://cryptonex.us/auth/google/callback',
+      callbackURL: 'https://cryptonex.us/api/auth/google/callback',
       scope: ['email', 'profile'],
       passReqToCallback: true,
     });
   }
 
-  async validate(accessToken: string, refreshToken: string, profile: any, done: VerifyCallback) {
+  async validate(req: Request, accessToken: string, refreshToken: string, profile: any, done: VerifyCallback) {
+    console.log('Google profile:', profile);
     const user = await this.authService.findOrCreateGoogleUser(profile);
     done(null, user);
   }

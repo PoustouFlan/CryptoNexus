@@ -5,6 +5,7 @@ import { JwtAuthGuard } from './jwt.guard';
 import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
+import { User as PrismaUser } from '@prisma/client';
 
 @Controller('auth')
 export class AuthController {
@@ -22,7 +23,8 @@ export class AuthController {
     if (!req.user)
       throw Error("Expected user in request");
     const token = await this.authService.login(req.user);
-    const { id, email, name } = req.user;
+    const user = req.user as PrismaUser;
+    const { id, email, name } = user;
     return {
       access_token: token.access_token,
       user: { id, email, name },
@@ -47,6 +49,6 @@ export class AuthController {
   async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
     const user = req.user;
     const token = (await this.authService.login(user)).access_token;
-    return res.redirect(`https://cryptonex.us/login?token=${token}`);
+    return res.redirect(`https://cryptonex.us/auth/login?token=${token}`);
   }
 }
