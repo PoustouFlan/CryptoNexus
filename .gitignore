@@ -1,45 +1,53 @@
-#Maven
-target/
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-release.properties
-.flattened-pom.xml
+# Node.js dependencies
+**/node_modules
+**/package-lock.json
+**/pnpm-lock.yaml
+**/yarn.lock
 
-# Eclipse
-.project
-.classpath
-.settings/
-bin/
+# Build outputs
+**/dist
+**/.next
+**/out
+**/build
 
-# IntelliJ
-.idea
-*.ipr
-*.iml
-*.iws
+# Logs
+**/logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# NetBeans
-nb-configuration.xml
-
-# Visual Studio Code
-.vscode
-.factorypath
-
-# OSX
-.DS_Store
-
-# Vim
-*.swp
-*.swo
-
-# patch
-*.orig
-*.rej
-
-# Local environment
+# Environment variables
 .env
+.env.local
+.env.*.local
 
-# Plugin directory
-/.quarkus/cli/plugins/
-# TLS Certificates
-.certs/
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker
+**/docker-compose.override.yml
+**/db-data
+**/*.pid
+**/tmp
+
+# IDE / Editor
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Prisma
+**/prisma/migrations
+**/prisma/dev.db
+
+# TypeScript compiled output
+**/*.js
+**/*.js.map
+**/*.d.ts
+
+# Temporary files
+*.tmp
+*.swp
+

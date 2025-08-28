@@ -1,25 +1,77 @@
-version: '3.8'
-
 services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: nexus
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - internal
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   backend:
-    build:
-      context: ./backend
+    build: ./backend
     container_name: cryptonexus-backend-1
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/nexus
+      JWT_SECRET: ${JWT_SECRET}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+    depends_on:
+      - db
     ports:
-      - "8080"
+      - "4000:4000"
+    volumes:
+      - ./backend:/app
     networks:
       - web
+      - internal
+    env_file:
+      - .env
+
+  migrate:
+    build: ./backend
+    command: ["npx", "prisma", "migrate", "deploy"]
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/nexus
+    volumes:
+      - ./backend:/app
+    env_file:
+      - .env
+    networks:
+      - internal
+    depends_on:
+      db:
+        condition: service_healthy
 
   frontend:
-    build:
-      context: ./frontend
+    build: ./frontend
     container_name: cryptonexus-frontend-1
-    volumes:
-      - ./frontend/nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./frontend/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+    environment:
+      NEXT_PUBLIC_API_URL: https://cryptonex.us:4000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
     networks:
       - web
+    env_file:
+      - .env
+
+volumes:
+  db-data:
 
 networks:
   web:
     external: true
+  internal:
+    driver: bridge
