@@ -9,10 +9,12 @@ import { AuthModule } from './auth/auth.module';
 })
 class AppModule {}
 
+const FRONTEND_URL = process.env.NEXT_PUBLIC_FRONTEND_URL;
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-      origin: ["https://cryptonex.us:3000"],
+      origin: [FRONTEND_URL],
       credentials: true,
   });
   await app.listen(4000);

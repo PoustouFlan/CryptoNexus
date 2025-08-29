@@ -8,12 +8,14 @@ type Course = {
   slug: string;
 };
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 export default function CoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("https://cryptonex.us/api/courses")
+    fetch(`${BACKEND_URL}/courses`)
       .then((res) => res.json())
       .then((data) => {
         setCourses(data);

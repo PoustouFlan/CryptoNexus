@@ -14,6 +14,7 @@ type AuthContextType = {
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -21,7 +22,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
-    fetch("https://cryptonex.us/api/auth/profile", {
+    fetch(`${BACKEND_URL}/auth/profile`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

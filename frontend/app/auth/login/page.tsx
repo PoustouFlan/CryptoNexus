@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../userContext";
 import { useRouter, useSearchParams } from "next/navigation";
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 export default function LoginPage() {
   const { setUser } = useAuth();
   const [email, setEmail] = useState("");
@@ -17,7 +19,7 @@ export default function LoginPage() {
     if (token) {
       localStorage.setItem("token", token);
 
-      fetch("https://cryptonex.us/api/auth/profile", {
+      fetch(`${BACKEND_URL}/auth/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       })
         .then((res) => res.json())
@@ -35,7 +37,7 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
 
-    const res = await fetch("https://cryptonex.us/api/auth/login", {
+    const res = await fetch(`${BACKEND_URL}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -53,7 +55,7 @@ export default function LoginPage() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = "https://cryptonex.us/api/auth/google";
+    window.location.href = `${BACKEND_URL}/auth/google`;
   };
 
   return (

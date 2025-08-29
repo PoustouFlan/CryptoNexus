@@ -2,17 +2,20 @@
 
 import { useState } from "react";
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState("");
 
+  console.log(`BACKEND URL: ${BACKEND_URL}`);
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    const res = await fetch("https://cryptonex.us/api/auth/register", {
+    const res = await fetch(`${BACKEND_URL}/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password, name }),

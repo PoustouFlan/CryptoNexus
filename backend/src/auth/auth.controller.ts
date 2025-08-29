@@ -7,6 +7,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { User as PrismaUser } from '@prisma/client';
 
+const FRONTEND_URL = process.env.NEXT_PUBLIC_FRONTEND_URL;
+
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -37,7 +39,6 @@ export class AuthController {
     return req.user;
   }
 
-  // Google OAuth
   @Get('google')
   @UseGuards(AuthGuard('google'))
   async googleAuth() {
@@ -49,6 +50,6 @@ export class AuthController {
   async googleAuthRedirect(@Req() req: Request, @Res() res: Response) {
     const user = req.user;
     const token = (await this.authService.login(user)).access_token;
-    return res.redirect(`https://cryptonex.us/auth/login?token=${token}`);
+    return res.redirect(`${FRONTEND_URL}/auth/login?token=${token}`);
   }
 }

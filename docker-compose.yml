@@ -26,6 +26,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      NEXT_PUBLIC_FRONTEND_URL: ${NEXT_PUBLIC_FRONTEND_URL}
     depends_on:
       - db
     ports:
@@ -57,7 +58,7 @@ services:
     build: ./frontend
     container_name: cryptonexus-frontend-1
     environment:
-      NEXT_PUBLIC_API_URL: https://cryptonex.us/api
+      NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
     ports:
       - "3000:3000"
     depends_on:
