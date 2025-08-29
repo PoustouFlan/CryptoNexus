@@ -2,9 +2,10 @@ import { NestFactory } from '@nestjs/core';
 import { Module } from '@nestjs/common';
 import { CoursesController } from './courses.controller';
 import { AuthModule } from './auth/auth.module';
+import { UsersController } from './users.controller';
 
 @Module({
-  controllers: [CoursesController],
+  controllers: [CoursesController, UsersController],
   imports: [AuthModule],
 })
 class AppModule {}

@@ -1,13 +1,17 @@
-import "./globals.css";
-import Link from "next/link";
-import { AuthProvider } from "./auth/userContext";
+import './globals.css';
+import 'katex/dist/katex.min.css';
+import Link from 'next/link';
+import { AuthProvider } from './auth/userContext';
+
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <header className="p-4 border-b flex justify-between">
+        <header className="p-4 border-b flex gap-4 items-center">
           <Link href="/">Home</Link>
+          <Link href="/courses">Courses</Link>
+          <Link href="/courses/new" className="ml-auto">New course</Link>
           <Link href="/profile">Profile</Link>
         </header>
         <AuthProvider>{children}</AuthProvider>
@@ -15,4 +19,3 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   );
 }
-
