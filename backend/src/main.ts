@@ -3,9 +3,10 @@ import { Module } from '@nestjs/common';
 import { CoursesController } from './courses.controller';
 import { AuthModule } from './auth/auth.module';
 import { UsersController } from './users.controller';
+import { CategoriesController } from './categories.controller';
 
 @Module({
-  controllers: [CoursesController, UsersController],
+  controllers: [CoursesController, UsersController, CategoriesController],
   imports: [AuthModule],
 })
 class AppModule {}

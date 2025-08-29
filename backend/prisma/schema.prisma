@@ -18,14 +18,29 @@ model User {
   courses   Course[] @relation("UserCourses")
 }
 
-model Course {
-  id          String   @id @default(uuid())
-  title       String
-  slug        String   @unique
-  content     String
-  official    Boolean  @default(false)
-  createdAt   DateTime @default(now())
+model Category {
+  id          String     @id @default(uuid())
+  name        String
+  slug        String
+  icon        String?
+  parentId    String?
+  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children    Category[] @relation("CategoryHierarchy")
 
-  authorId String
-  author   User   @relation("UserCourses", fields: [authorId], references: [id])
+  courses     Course[]
+}
+
+model Course {
+  id          String    @id @default(uuid())
+  title       String
+  slug        String    @unique
+  content     String
+  official    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+
+  authorId    String
+  author      User      @relation("UserCourses", fields: [authorId], references: [id])
+
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id])
 }

@@ -7,7 +7,7 @@ import { AuthProvider } from './auth/userContext';
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>
+      <body className="bg-gradient-to-br from-blue-900 to-blue-700 text-gray-200 font-sans">
         <header className="p-4 border-b flex gap-4 items-center">
           <Link href="/">Home</Link>
           <Link href="/courses">Courses</Link>

@@ -1,47 +1,53 @@
+'use client';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
-
+import rehypeHighlight from 'rehype-highlight';
+import 'highlight.js/styles/github-dark.css';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-
 type Course = {
-    id: string;
-    title: string;
-    slug: string;
-    content: string;
-    official: boolean;
-    createdAt: string;
-    author?: { id: string; name?: string | null; email?: string | null };
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  official: boolean;
+  createdAt: string;
+  author?: { id: string; name?: string | null; email?: string | null };
 };
 
+export default function CoursePage() {
+  const { slug } = useParams() as { slug: string };
+  const [course, setCourse] = useState<Course | null>(null);
 
-async function fetchCourse(slug: string): Promise<Course | null> {
-    const res = await fetch(`${BACKEND_URL}/courses/${slug}`, { cache: 'no-store' });
-    if (!res.ok) return null;
-    return res.json();
-}
+  useEffect(() => {
+    async function fetchCourse() {
+      const res = await fetch(`${BACKEND_URL}/courses/${slug}`, { cache: 'no-store' });
+      if (res.ok) setCourse(await res.json());
+    }
+    fetchCourse();
+  }, [slug]);
 
+  if (!course) return <div className="p-6 text-gray-200">Loading course…</div>;
 
-export default async function CoursePage({ params }: { params: { slug: string } }) {
-    const { slug } = await params;
-    const course = await fetchCourse(slug);
-    if (!course) return <div className="p-6">Course not found.</div>;
-
-
-    return (
-        <div className="p-6 max-w-3xl mx-auto prose">
-            <h1>{course.title}</h1>
-            <div className="text-sm text-gray-500">
-                {course.official ? 'Official' : 'Unofficial'} · {new Date(course.createdAt).toLocaleString()}
-                {course.author?.name ? ` · by ${course.author.name}` : null}
-            </div>
-            <hr className="my-4" />
-            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
-                {course.content}
-            </ReactMarkdown>
-        </div>
-    );
+  return (
+    <div className="p-6 max-w-5xl mx-auto prose prose-invert">
+      <h1>{course.title}</h1>
+      <div className="text-sm text-gray-400 mb-2">
+        {course.official ? 'Official' : 'Unofficial'} · {new Date(course.createdAt).toLocaleString()}
+        {course.author?.name ? ` · by ${course.author.name}` : null}
+      </div>
+      <hr className="my-4 border-gray-700" />
+      <ReactMarkdown
+        remarkPlugins={[remarkGfm, remarkMath]}
+        rehypePlugins={[rehypeKatex, rehypeHighlight]}
+      >
+        {course.content}
+      </ReactMarkdown>
+    </div>
+  );
 }
