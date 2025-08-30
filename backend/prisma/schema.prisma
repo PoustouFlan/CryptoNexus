@@ -8,14 +8,16 @@ generator client {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String?
-  password  String?
-  googleId  String?  @unique
-  createdAt DateTime @default(now())
+  id          String        @id @default(uuid())
+  email       String        @unique
+  name        String?
+  password    String?
+  googleId    String?       @unique
+  createdAt   DateTime      @default(now())
 
-  courses   Course[] @relation("UserCourses")
+  courses     Course[]      @relation("UserCourses")
+  exercises   Exercise[]    @relation("UserExercises")
+  submissions Submission[]  @relation("UserSubmissions")
 }
 
 model Category {
@@ -43,4 +45,46 @@ model Course {
 
   categoryId  String?
   category    Category? @relation(fields: [categoryId], references: [id])
+}
+
+model Exercise {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  statement   String
+  codeStub    String?
+  language    String   @default("python")
+  timeoutSec  Int      @default(3)
+  official    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  
+  
+  authorId    String
+  author      User     @relation("UserExercises", fields: [authorId], references: [id])
+  
+  
+  tests       ExerciseTest[]
+  submissions Submission[]
+}
+
+
+model ExerciseTest {
+  id         String   @id @default(uuid())
+  exerciseId String
+  exercise   Exercise @relation(fields: [exerciseId], references: [id])
+  idx        Int
+  input      String
+  expected   String
+}
+
+
+model Submission {
+  id         String   @id @default(uuid())
+  exerciseId String
+  exercise   Exercise @relation(fields: [exerciseId], references: [id])
+  authorId   String?
+  author     User?    @relation("UserSubmissions", fields: [authorId], references: [id])
+  createdAt  DateTime @default(now())
+  status     String
+  resultJson String
 }

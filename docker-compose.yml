@@ -29,8 +29,8 @@ services:
       NEXT_PUBLIC_FRONTEND_URL: ${NEXT_PUBLIC_FRONTEND_URL}
     depends_on:
       - db
-    ports:
-      - "4000:4000"
+    # ports:
+    #   - "4000:4000"
     volumes:
       - ./backend:/app
     networks:
@@ -59,8 +59,8 @@ services:
     container_name: cryptonexus-frontend-1
     environment:
       NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
-    ports:
-      - "3000:3000"
+    # ports:
+    #   - "3000:3000"
     depends_on:
       - backend
     networks:
