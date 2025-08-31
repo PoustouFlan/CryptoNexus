@@ -45,6 +45,16 @@ model Course {
 
   categoryId  String?
   category    Category? @relation(fields: [categoryId], references: [id])
+
+  exercises   CourseExercise[]
+}
+
+model CourseExercise {
+  id          String   @id @default(uuid())
+  courseId    String
+  exerciseId  String
+  course      Course   @relation(fields: [courseId], references: [id])
+  exercise    Exercise @relation(fields: [exerciseId], references: [id])
 }
 
 model Exercise {
@@ -57,14 +67,15 @@ model Exercise {
   timeoutSec  Int      @default(3)
   official    Boolean  @default(false)
   createdAt   DateTime @default(now())
-  
+  allowedLibs String[] @default([])
   
   authorId    String
   author      User     @relation("UserExercises", fields: [authorId], references: [id])
   
-  
   tests       ExerciseTest[]
   submissions Submission[]
+
+  courses     CourseExercise[]
 }
 
 

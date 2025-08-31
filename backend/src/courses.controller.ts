@@ -8,7 +8,6 @@ const prisma = new PrismaClient();
 
 @Controller('courses')
 export class CoursesController {
-  // Public list, minimal fields + author name
   @Get()
   async allCourses() {
     return prisma.course.findMany({
@@ -22,7 +21,10 @@ export class CoursesController {
   async getCourse(@Param('slug') slug: string) {
     return prisma.course.findUnique({
       where: { slug },
-      include: { author: { select: { id: true, name: true, email: true } } },
+      include: {
+        author: { select: { id: true, name: true, email: true } },
+        exercises: { include: { exercise: { select: { id: true, title: true, slug: true } } } },
+      },
     });
   }
 
@@ -47,7 +49,7 @@ export class CoursesController {
         title: body.title,
         slug,
         content: body.content,
-        official: !!body.official && false, // force false for now; gate later with roles
+        official: !!body.official,
         authorId: user.id,
       },
       select: { id: true, title: true, slug: true },

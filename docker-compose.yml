@@ -46,6 +46,7 @@ services:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/nexus
     volumes:
       - ./backend:/app
+      - /var/run/docker.sock:/var/run/docker.sock
     env_file:
       - .env
     networks:
