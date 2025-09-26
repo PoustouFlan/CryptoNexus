@@ -11,15 +11,16 @@ import Link from 'next/link';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-// type Course = {
-//   id: string;
-//   title: string;
-//   slug: string;
-//   content: string;
-//   official: boolean;
-//   createdAt: string;
-//   author?: { id: string; name?: string | null; email?: string | null };
-// };
+type Course = {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  official: boolean;
+  createdAt: string;
+  author?: { id: string; name?: string | null; email?: string | null };
+  exercises: {id: string; slug: string; title: string}[];
+};
 
 export default function CoursePage() {
   const { slug } = useParams() as { slug: string };
