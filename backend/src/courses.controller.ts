@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Req, UseGuards, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Param, Req, UseGuards, BadRequestException } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { JwtAuthGuard } from './auth/jwt.guard';
 import { makeUniqueCourseSlug } from './utils/slug';
@@ -12,10 +12,17 @@ export class CoursesController {
   async allCourses() {
     return prisma.course.findMany({
       orderBy: { createdAt: 'desc' },
-      select: { id: true, title: true, slug: true, official: true, createdAt: true, author: { select: { id: true, name: true } } },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        official: true,
+        createdAt: true,
+        author: { select: { id: true, name: true } },
+        category: { select: { id: true, name: true, slug: true } },
+      },
     });
   }
-
 
   @Get(':slug')
   async getCourse(@Param('slug') slug: string) {
@@ -23,27 +30,31 @@ export class CoursesController {
       where: { slug },
       include: {
         author: { select: { id: true, name: true, email: true } },
-        exercises: { include: { exercise: { select: { id: true, title: true, slug: true } } } },
+        category: { select: { id: true, name: true, slug: true } },
+        exercises: {
+          include: {
+            exercise: {
+              select: {
+                id: true,
+                title: true,
+                slug: true,
+                language: true,
+                createdAt: true,
+              },
+            },
+          },
+        },
       },
     });
   }
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  // TODO CreateCourseDTO
   async createCourse(@Req() req: Request, @Body() body: any) {
     const user = req.user as any;
     if (!user?.id) throw new Error('Unauthorized');
-
-
-    if (!body?.title || !body?.content) {
-      throw new Error('Missing title or content');
-    }
-
-
+    if (!body?.title || !body?.content) throw new Error('Missing title or content');
     const slug = await makeUniqueCourseSlug(body.title);
-
-
     const course = await prisma.course.create({
       data: {
         title: body.title,
@@ -55,21 +66,24 @@ export class CoursesController {
       },
       select: { id: true, title: true, slug: true },
     });
-
-
     return course;
   }
-}
 
-
-@Controller('course-exercises')
-export class CourseExercisesController {
   @UseGuards(JwtAuthGuard)
-  @Post()
-  async link(@Req() req: Request, @Body() body: { courseId: string; exerciseId: string }) {
-    if (!body.courseId || !body.exerciseId) throw new BadRequestException('Missing courseId or exerciseId');
-    return prisma.courseExercise.create({
-      data: { courseId: body.courseId, exerciseId: body.exerciseId },
+  @Put(':slug')
+  async updateCourse(@Param('slug') slug: string, @Req() req: Request, @Body() body: any) {
+    const user = req.user as any;
+    if (!user?.id) throw new Error('Unauthorized');
+    const course = await prisma.course.findUnique({ where: { slug } });
+    if (!course) throw new BadRequestException('Course not found');
+    if (course.authorId !== user.id) throw new BadRequestException('Cannot edit others course');
+    return prisma.course.update({
+      where: { slug },
+      data: {
+        title: body.title || course.title,
+        content: body.content || course.content,
+        categoryId: body.categoryId || course.categoryId,
+      },
     });
   }
 }
