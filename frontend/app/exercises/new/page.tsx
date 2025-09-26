@@ -2,8 +2,11 @@
 import React, { useState } from 'react'
 import CourseEditor from '@/components/CourseEditor'
 
+
+type Exercise = { title: string; statement: string; codeStub: string; allowedLibs: string[]; tests: { input: string; expected: string }[] };
+
 export default function Page(){
-  const [draft, setDraft] = useState({ title: '', statement: '', codeStub: '', tests: [{input: '', expected: ''}] });
+  const [draft, setDraft] = useState<Exercise>({ title: '', statement: '', codeStub: '', allowedLibs: [], tests: [{input: '', expected: ''}] });
   const [saving, setSaving] = useState(false);
 
   function onPatch(p: any){ setDraft(d => ({ ...d, ...p })); }
@@ -28,10 +31,18 @@ export default function Page(){
           <textarea placeholder="expected output" value={t.expected} onChange={e => { const ts = [...draft.tests]; ts[i].expected = e.target.value; setDraft(d => ({ ...d, tests: ts })); }} className="p-2 bg-slate-800" />
         </div>
       ))}
+      <label>Allowed libraries (comma separated)</label>
+      {draft.allowedLibs.map((t,i)=> (
+        <div key={i} className="grid grid-cols-2 gap-2 mt-2">
+          <textarea placeholder="pycryptodome" value={t} onChange={e => { var ts = [...draft.allowedLibs]; ts[i] = e.target.value; setDraft(d => ({ ...d, allowedLibs: ts })); }} className="p-2 bg-slate-800" />
+        </div>
+      ))}
       <div className="mt-2">
         <button onClick={() => setDraft(d => ({ ...d, tests: [...d.tests, { input: '', expected: '' }] }))} className="mr-2">Add test</button>
+        <button onClick={() => setDraft(d => ({ ...d, allowedLibs: [...d.allowedLibs, ''] }))} className="mr-2">Add library</button>
         <button onClick={create} disabled={saving}>{saving ? 'Saving...' : 'Create'}</button>
       </div>
     </div>
+
   </div>)
 }

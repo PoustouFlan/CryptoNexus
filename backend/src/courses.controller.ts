@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Req, UseGuards, BadRequestException } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { JwtAuthGuard } from './auth/jwt.guard';
 import { makeUniqueCourseSlug } from './utils/slug';
@@ -51,11 +51,25 @@ export class CoursesController {
         content: body.content,
         official: !!body.official,
         authorId: user.id,
+        categoryId: body.categoryId || null,
       },
       select: { id: true, title: true, slug: true },
     });
 
 
     return course;
+  }
+}
+
+
+@Controller('course-exercises')
+export class CourseExercisesController {
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  async link(@Req() req: Request, @Body() body: { courseId: string; exerciseId: string }) {
+    if (!body.courseId || !body.exerciseId) throw new BadRequestException('Missing courseId or exerciseId');
+    return prisma.courseExercise.create({
+      data: { courseId: body.courseId, exerciseId: body.exerciseId },
+    });
   }
 }

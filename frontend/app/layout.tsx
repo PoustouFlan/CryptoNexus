@@ -12,6 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Link href="/">Home</Link>
           <Link href="/courses">Courses</Link>
           <Link href="/courses/new" className="ml-auto">New course</Link>
+          <Link href="/exercises/new">New Exercise</Link>
           <Link href="/profile">Profile</Link>
         </header>
         <AuthProvider>{children}</AuthProvider>

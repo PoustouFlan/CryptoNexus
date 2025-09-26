@@ -1,4 +1,5 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, UseGuards, BadRequestException } from '@nestjs/common';
+import { JwtAuthGuard } from './auth/jwt.guard';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -25,5 +26,21 @@ export class CategoriesController {
     });
     if (!category) return null;
     return category;
+  }
+
+
+  @UseGuards(JwtAuthGuard)
+  @Post()
+  async createCategory(@Body() body: any) {
+    if (!body.name) throw new BadRequestException('Missing name');
+    const slug = body.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    return prisma.category.create({
+      data: {
+        name: body.name,
+        slug,
+        parentId: body.parentId || null,
+        icon: body.icon || null,
+      },
+    });
   }
 }

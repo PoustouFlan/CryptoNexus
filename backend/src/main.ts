@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { Module } from '@nestjs/common';
-import { CoursesController } from './courses.controller';
+import { CourseExercisesController, CoursesController } from './courses.controller';
 import { AuthModule } from './auth/auth.module';
 import { UsersController } from './users.controller';
 import { CategoriesController } from './categories.controller';
@@ -8,7 +8,7 @@ import { ExercisesController } from './exercises.controller';
 import { RunnerService } from './runner.service';
 
 @Module({
-  controllers: [CoursesController, UsersController, CategoriesController, ExercisesController],
+  controllers: [CoursesController, UsersController, CategoriesController, ExercisesController, CourseExercisesController],
   imports: [AuthModule],
   providers: [RunnerService],
 })

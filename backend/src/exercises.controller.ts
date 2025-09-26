@@ -46,6 +46,13 @@ export class ExercisesController {
       slug = `${slugBase}-${i}`;
     }
 
+    for (let lib of body.allowedLibs)
+    {
+      if (!/^[a-zA-Z0-9]+$/.test(lib))
+        throw new BadRequestException("Invalid library name");
+    }
+
+    console.log(body);
     const exercise = await prisma.exercise.create({
       data: {
         title: body.title,
@@ -56,6 +63,7 @@ export class ExercisesController {
         timeoutSec: body.timeoutSec || 3,
         official: !!body.official && false,
         authorId: user.id,
+        allowedLibs: Array.isArray(body.allowedLibs) ? body.allowedLibs : [],
       },
     });
 

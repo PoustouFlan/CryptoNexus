@@ -7,18 +7,19 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github-dark.css';
+import Link from 'next/link';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-type Course = {
-  id: string;
-  title: string;
-  slug: string;
-  content: string;
-  official: boolean;
-  createdAt: string;
-  author?: { id: string; name?: string | null; email?: string | null };
-};
+// type Course = {
+//   id: string;
+//   title: string;
+//   slug: string;
+//   content: string;
+//   official: boolean;
+//   createdAt: string;
+//   author?: { id: string; name?: string | null; email?: string | null };
+// };
 
 export default function CoursePage() {
   const { slug } = useParams() as { slug: string };
@@ -48,6 +49,14 @@ export default function CoursePage() {
       >
         {course.content}
       </ReactMarkdown>
+      <h2 className="text-xl font-bold mt-10">Exercises</h2>
+      <ul>
+        {course.exercises.map((ce:any) => (
+          <li key={ce.exercise.id}>
+            <Link href={`/exercises/${ce.exercise.slug}`}>{ce.exercise.title}</Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

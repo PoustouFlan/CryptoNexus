@@ -61,10 +61,10 @@ export class RunnerService {
       'python:3.11-slim',
       'sh', '-c',
       [
-        allowedLibs.map(lib => `pip install --no-index --find-links=/wheels/${lib} ${lib} > /dev/null 2>&1`).join(' && '),
+        ...allowedLibs.map(lib => `pip install --no-index --find-links=/wheels/${lib} ${lib} > /dev/null 2>&1`),
         `timeout ${Math.max(5, (exercise.timeoutSec || 3) * tests.length + 2)}s python3 runner.py`
       ].join(' && ')
-    ];
+    ]; // 200% y'a une injection facile ici mdr
 
 
     try {
