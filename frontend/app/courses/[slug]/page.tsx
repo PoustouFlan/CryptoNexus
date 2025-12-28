@@ -9,6 +9,7 @@ import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github-dark.css';
 import Link from 'next/link';
 import TikzRenderer from '@/components/TikzRenderer';
+import rehypeRaw from 'rehype-raw';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -47,7 +48,7 @@ export default function CoursePage() {
       <hr className="my-4 border-gray-700" />
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
-        rehypePlugins={[rehypeKatex, rehypeHighlight]}
+        rehypePlugins={[rehypeKatex, rehypeHighlight, rehypeRaw]}
         components={{
           code({ node, inline, className, children, ...props }: any) {
             const match = /language-(\w+)/.exec(className || '');

@@ -92,8 +92,6 @@ export class CoursesController {
       },
     });
 
-    const allCategories = await prisma.category.findMany();
-
-    return { course: updatedCourse, allCategories };
+    return updatedCourse;
   }
 }
