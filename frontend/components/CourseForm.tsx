@@ -39,6 +39,12 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 const REMARK_PLUGINS = [remarkGfm, remarkMath];
 const REHYPE_PLUGINS = [rehypeKatex, rehypeHighlight, rehypeRaw];
 
+const isCustomBlock = (child: any) => {
+  if (!child || !child.props || !child.props.className) return false;
+  const className = child.props.className;
+  return /language-(tikz|jsx|react)/.test(className);
+};
+
 // Memoized Preview Component
 const CoursePreview = memo(function CoursePreview({ content }: { content: string }) {
   return (
@@ -47,6 +53,13 @@ const CoursePreview = memo(function CoursePreview({ content }: { content: string
         remarkPlugins={REMARK_PLUGINS}
         rehypePlugins={REHYPE_PLUGINS}
         components={{
+          pre: ({ node, children, ...props }: any) => {
+            const codeElement = React.Children.toArray(children)[0];
+            if (React.isValidElement(codeElement) && isCustomBlock(codeElement)) {
+              return <>{children}</>;
+            }
+            return <pre {...props}>{children}</pre>;
+          },
           code({ node, inline, className, children, ...props }: any) {
             const match = /language-(\w+)/.exec(className || '');
             const lang = match ? match[1] : '';

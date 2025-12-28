@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import ZoomableContainer from './ZoomableContainer';
 
 async function getHash(text: string) {
   const msgBuffer = new TextEncoder().encode(text);
@@ -84,10 +85,12 @@ export default function TikzRenderer({ code }: { code: string }) {
 
   if (cachedSvg) {
     return (
-      <div 
-        className="flex justify-center my-6 overflow-x-auto bg-slate-900 p-4 rounded-lg border border-slate-800 shadow-sm"
-        dangerouslySetInnerHTML={{ __html: cachedSvg }} 
-      />
+      <ZoomableContainer>
+        <div 
+            className="flex justify-center my-6 overflow-x-auto bg-slate-900 p-4 rounded-lg border border-slate-800 shadow-sm"
+            dangerouslySetInnerHTML={{ __html: cachedSvg }} 
+        />
+      </ZoomableContainer>
     );
   }
 

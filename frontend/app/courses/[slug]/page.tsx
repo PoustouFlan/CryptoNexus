@@ -11,6 +11,7 @@ import Link from 'next/link';
 import TikzRenderer from '@/components/TikzRenderer';
 import rehypeRaw from 'rehype-raw';
 import InteractiveRunner from '@/components/InteractiveRunner';
+import ZoomableContainer from '@/components/ZoomableContainer';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -23,6 +24,12 @@ type Course = {
   createdAt: string;
   author?: { id: string; name?: string | null; email?: string | null };
   exercises: {id: string; slug: string; title: string}[];
+};
+
+const isCustomBlock = (child: any) => {
+  if (!child || !child.props || !child.props.className) return false;
+  const className = child.props.className;
+  return /language-(tikz|jsx|react)/.test(className);
 };
 
 export default function CoursePage() {
@@ -51,6 +58,25 @@ export default function CoursePage() {
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeKatex, rehypeHighlight, rehypeRaw]}
         components={{
+          div: ({ node, className, children, ...props }: any) => {
+            if (className?.includes('tikz-diagram-container')) {
+              return (
+                <ZoomableContainer className={className}>
+                  <div className="w-full flex justify-center" {...props}>
+                    {children}
+                  </div>
+                </ZoomableContainer>
+              );
+            }
+            return <div className={className} {...props}>{children}</div>;
+          },
+          pre: ({ node, children, ...props }: any) => {
+            const codeElement = React.Children.toArray(children)[0];
+            if (React.isValidElement(codeElement) && isCustomBlock(codeElement)) {
+              return <>{children}</>;
+            }
+            return <pre {...props}>{children}</pre>;
+          },
           code({ node, inline, className, children, ...props }: any) {
             const match = /language-(\w+)/.exec(className || '');
             const lang = match ? match[1] : '';
