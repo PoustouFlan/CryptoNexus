@@ -8,6 +8,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypeHighlight from 'rehype-highlight';
 import 'highlight.js/styles/github-dark.css';
+import TikzRenderer from './TikzRenderer';
 
 interface Exercise {
   id: string;
@@ -85,6 +86,7 @@ export default function CourseForm({ initialData, slug, onSuccess }: CourseFormP
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium mb-1">Content (Markdown + LaTeX + Code)</label>
+          <br/>
           <textarea
             value={content}
             onChange={e => setContent(e.target.value)}
@@ -95,7 +97,24 @@ export default function CourseForm({ initialData, slug, onSuccess }: CourseFormP
           <p className="text-xs text-gray-300 mt-1">Supports GFM, LaTeX, and syntax-highlighted code. Use ```python etc. for code blocks.</p>
         </div>
         <div className="prose prose-invert max-w-none p-4 rounded bg-blue-800 overflow-y-auto min-h-[500px]">
-          <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex, rehypeHighlight]}>
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm, remarkMath]}
+            rehypePlugins={[rehypeKatex, rehypeHighlight]}
+            components={{
+              code({ node, inline, className, children, ...props }: any) {
+                const match = /language-(\w+)/.exec(className || '');
+                const isTikz = match && match[1] === 'tikz';
+                if (!inline && isTikz) {
+                  return <TikzRenderer code={String(children).replace(/\n$/, '')} />;
+                }
+                return (
+                  <code className={className} {...props}>
+                    {children}
+                  </code>
+                );
+              }
+            }}
+            >
             {content}
           </ReactMarkdown>
         </div>

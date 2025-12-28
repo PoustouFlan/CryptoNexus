@@ -36,7 +36,7 @@
     "@types/passport-google-oauth20": "^2.0.16",
     "@types/passport-jwt": "^4.0.1",
     "@types/passport-local": "^1.0.38",
-    "prisma": "^6.15.0",
+    "prisma": "^6.19.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
   }

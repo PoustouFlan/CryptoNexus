@@ -8,22 +8,12 @@ const prisma = new PrismaClient();
 
 @Controller('courses')
 export class CoursesController {
-  @Get('*categoryPath/:courseSlug')
+  @Get(':courseSlug')
   async getCourse(
-    @Param('categoryPath') categoryPath: string,
     @Param('courseSlug') courseSlug: string,
   ) {
-    const categories = categoryPath.split('/').filter(Boolean);
-    let parent: any = null;
-    for (const slug of categories) {
-      const cat = await prisma.category.findFirst({
-        where: { slug, parentId: parent ? parent.id : null },
-      });
-      if (!cat) throw new NotFoundException('Category not found');
-      parent = cat;
-    }
     const course = await prisma.course.findFirst({
-      where: { slug: courseSlug, categoryId: parent?.id || null },
+      where: { slug: courseSlug },
       include: {
         author: { select: { id: true, name: true, email: true } },
         category: { select: { id: true, name: true, slug: true } },
@@ -47,9 +37,8 @@ export class CoursesController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('*categoryPath')
+  @Post()
   async createCourse(
-    @Param('categoryPath') categoryPath: string,
     @Req() req: Request,
     @Body() body: any,
   ) {
@@ -57,16 +46,6 @@ export class CoursesController {
     if (!user?.id) throw new Error('Unauthorized');
     if (!body?.title || !body?.content)
       throw new Error('Missing title or content');
-
-    const categories = categoryPath.split('/').filter(Boolean);
-    let parent: any = null;
-    for (const slug of categories) {
-      const cat = await prisma.category.findFirst({
-        where: { slug, parentId: parent ? parent.id : null },
-      });
-      if (!cat) throw new BadRequestException('Category not found');
-      parent = cat;
-    }
 
     const slug = await makeUniqueCourseSlug(body.title);
 
@@ -79,18 +58,17 @@ export class CoursesController {
         content: body.content,
         official: !!body.official,
         authorId: user.id,
-        categoryId: parent?.id || null,
+        categoryId: body.categoryId || null,
       },
       select: { id: true, title: true, slug: true, categoryId: true },
     });
 
-    return { course, allCategories };
+    return course;
   }
 
   @UseGuards(JwtAuthGuard)
-  @Put('*categoryPath/:courseSlug')
+  @Put(':courseSlug')
   async updateCourse(
-    @Param('categoryPath') categoryPath: string,
     @Param('courseSlug') courseSlug: string,
     @Req() req: Request,
     @Body() body: any,
@@ -98,18 +76,8 @@ export class CoursesController {
     const user = req.user as any;
     if (!user?.id) throw new Error('Unauthorized');
 
-    const categories = categoryPath.split('/').filter(Boolean);
-    let parent: any = null;
-    for (const slug of categories) {
-      const cat = await prisma.category.findFirst({
-        where: { slug, parentId: parent ? parent.id : null },
-      });
-      if (!cat) throw new BadRequestException('Category not found');
-      parent = cat;
-    }
-
     const course = await prisma.course.findFirst({
-      where: { slug: courseSlug, categoryId: parent?.id || null },
+      where: { slug: courseSlug },
     });
     if (!course) throw new BadRequestException('Course not found');
     if (course.authorId !== user.id)

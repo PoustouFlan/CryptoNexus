@@ -15,19 +15,14 @@ export class CategoriesController {
     });
   }
 
-  @Get('*path')
-  async getCategory(@Param('path') path: string) {
-    const segments = path.split('/').filter(Boolean);
-    let parent: any = null;
-    for (const slug of segments) {
-      const cat = await prisma.category.findFirst({
-        where: { slug, parentId: parent ? parent.id : null },
-        include: { children: true, courses: { orderBy: { createdAt: 'desc' } } },
-      });
-      if (!cat) throw new NotFoundException('Category not found');
-      parent = cat;
-    }
-    return parent;
+  @Get(':slug')
+  async getCategory(@Param('slug') slug: string) {
+    const cat = await prisma.category.findFirst({
+      where: { slug },
+      include: { children: true, courses: { orderBy: { createdAt: 'desc' } } },
+    });
+    if (!cat) throw new NotFoundException('Category not found');
+    return cat;
   }
 
   @UseGuards(JwtAuthGuard)
@@ -46,24 +41,19 @@ export class CategoriesController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('*path')
-  async createSubCategory(@Param('path') path: string, @Body() body: any) {
+  @Post(':catSlug')
+  async createSubCategory(@Param('catSlug') catSlug: string, @Body() body: any) {
     if (!body.name) throw new BadRequestException('Missing name');
-    const segments = path.split('/').filter(Boolean);
-    let parent: any = null;
-    for (const slug of segments) {
-      const cat = await prisma.category.findFirst({
-        where: { slug, parentId: parent ? parent.id : null },
-      });
-      if (!cat) throw new BadRequestException('Parent category not found');
-      parent = cat;
-    }
+    const cat = await prisma.category.findFirst({
+      where: { slug: catSlug }
+    });
+    if (!cat) throw new BadRequestException('Parent category not found');
     const slug = body.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     return prisma.category.create({
       data: {
         name: body.name,
         slug,
-        parentId: parent?.id || null,
+        parentId: cat.id,
         icon: body.icon || null,
       },
     });
