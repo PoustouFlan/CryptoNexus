@@ -6,6 +6,13 @@ const config: Config = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./utils/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  safelist: [
+    'prose',
+    'prose-invert',
+    {
+      pattern: /^prose-/,
+    },
+  ],
   theme: {
     extend: {
       colors: {

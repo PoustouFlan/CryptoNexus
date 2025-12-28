@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react"; // 1. Import Suspense
 import { useAuth } from "../userContext";
 import { useRouter, useSearchParams } from "next/navigation";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-export default function LoginPage() {
+function LoginContent() {
   const { setUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -88,5 +88,13 @@ export default function LoginPage() {
       </button>
       {error && <p className="text-red-500 mt-2">{error}</p>}
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-center">Loading login...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }

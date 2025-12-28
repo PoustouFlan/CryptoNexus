@@ -1,8 +1,9 @@
 'use client';
-import { useState } from 'react';
+
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function CreateCategoryPage() {
+function CreateCategoryContent() {
   const [name, setName] = useState('');
   const [icon, setIcon] = useState('');
   const router = useRouter();
@@ -19,7 +20,7 @@ export default function CreateCategoryPage() {
 
     const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/categories`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
@@ -59,5 +60,13 @@ export default function CreateCategoryPage() {
         </button>
       </form>
     </div>
+  );
+}
+
+export default function CreateCategoryPage() {
+  return (
+    <Suspense fallback={<div className="p-8">Loading...</div>}>
+      <CreateCategoryContent />
+    </Suspense>
   );
 }
