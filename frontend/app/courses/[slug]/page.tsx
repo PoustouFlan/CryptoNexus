@@ -10,6 +10,7 @@ import 'highlight.js/styles/github-dark.css';
 import Link from 'next/link';
 import TikzRenderer from '@/components/TikzRenderer';
 import rehypeRaw from 'rehype-raw';
+import InteractiveRunner from '@/components/InteractiveRunner';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -52,9 +53,13 @@ export default function CoursePage() {
         components={{
           code({ node, inline, className, children, ...props }: any) {
             const match = /language-(\w+)/.exec(className || '');
-            const isTikz = match && match[1] === 'tikz';
-            if (!inline && isTikz) {
+            const lang = match ? match[1] : '';
+
+            if (!inline && lang === 'tikz') {
               return <TikzRenderer code={String(children).replace(/\n$/, '')} />;
+            }
+            if (!inline && (lang === 'jsx' || lang === 'react')) {
+              return <InteractiveRunner code={String(children).replace(/\n$/, '')} />;
             }
             return (
               <code className={className} {...props}>

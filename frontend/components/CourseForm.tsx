@@ -11,6 +11,7 @@ import 'highlight.js/styles/github-dark.css';
 import TikzRenderer from '@/components/TikzRenderer';
 import rehypeRaw from 'rehype-raw';
 import { compileTikzToSvg } from '@/utils/TikzCompiler';
+import InteractiveRunner from './InteractiveRunner';
 
 interface Exercise {
   id: string;
@@ -48,9 +49,13 @@ const CoursePreview = memo(function CoursePreview({ content }: { content: string
         components={{
           code({ node, inline, className, children, ...props }: any) {
             const match = /language-(\w+)/.exec(className || '');
-            const isTikz = match && match[1] === 'tikz';
-            if (!inline && isTikz) {
+            const lang = match ? match[1] : '';
+
+            if (!inline && lang === 'tikz') {
               return <TikzRenderer code={String(children).replace(/\n$/, '')} />;
+            }
+            if (!inline && (lang === 'jsx' || lang === 'react')) {
+              return <InteractiveRunner code={String(children).replace(/\n$/, '')} />;
             }
             return (
               <code className={className} {...props}>
@@ -85,7 +90,6 @@ export default function CourseForm({ initialData, slug, onSuccess }: CourseFormP
     fetch(`${BACKEND_URL}/categories`).then(res => res.json()).then(setAllCategories);
   }, []);
 
-  // Restore logic (Unbaking)
   useEffect(() => {
     if (initialData?.content) {
       let editableContent = initialData.content;
